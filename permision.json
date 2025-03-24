@@ -1,0 +1,47 @@
+{
+    "permissions": [
+        {
+            "type": "contract-call",
+            "data": {
+                "address": "0xC959483DBa39aa9E78757139af0e9a2EDEb3f42D",
+                "abi": [
+                    {
+                        "constant": false,
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "recipient",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "transfer",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                ],
+                "functions": [
+                    {
+                        "functionName": "transfer"
+                    }
+                ]
+            }
+        }
+    ],
+    "context": "921c8b1e-a42a-4d5a-8a3c-6d313d74c969",
+    "expiry": 1741151271184,
+    "address": "0xF06fd9f072A1AaB35497c3c2820094FD9AbA23EF",
+    "chainId": "0xaa36a7"
+}
