@@ -1,5 +1,5 @@
 import { createAppKit } from '@reown/appkit/react'
-import { networks, projectId, metadata, ethersAdapter } from './config'
+import { networks, projectId, metadata, ethersAdapter, solanaWeb3JsAdapter } from './config'
 import { ActionButtonList } from './components/ActionButtonList'
 import { SmartContractActionButtonList } from './components/SmartContractActionButtonList'
 import { InfoList } from './components/InfoList'
@@ -9,7 +9,7 @@ import "./App.css"
 
 // Create a AppKit instance
 createAppKit({
-  adapters: [ethersAdapter],
+  adapters: [ethersAdapter, solanaWeb3JsAdapter],
   networks,
   metadata,
   projectId,
@@ -26,7 +26,6 @@ export function App() {
   const [transactionHash, setTransactionHash] = useState('');
   const [signedMsg, setSignedMsg] = useState('');
   const [balance, setBalance] = useState('');
-
 
   const receiveHash = (hash: string) => {
     setTransactionHash(hash); // Update the state with the transaction hash

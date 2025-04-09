@@ -5,8 +5,10 @@ import { grantPermissions, type SmartSessionGrantPermissionsRequest } from '@reo
 import { toHex } from 'viem'
 import { SendTransaction } from './SendTransaction'
 import { useState } from 'react'
-import { prepareCalls } from '../utils/UserOpBuilderServiceUtils'
+import { prepareCalls, sendPreparedCalls } from '../utils/UserOpBuilderServiceUtils'
 import { encodeTokenTransfer } from '../utils/tokenTransferUtils'
+import { signMessage } from "viem/accounts";
+
 // const { walletProvider } = useAppKitProvider<Provider>('eip155')
 
 let abi=[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"previousAdmin","type":"address"},{"indexed":false,"internalType":"address","name":"newAdmin","type":"address"}],"name":"AdminChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"beacon","type":"address"}],"name":"BeaconUpgraded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"nftAddress","type":"address"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"string","name":"symbol","type":"string"},{"indexed":false,"internalType":"string","name":"uri","type":"string"},{"indexed":false,"internalType":"uint256","name":"maxSupply","type":"uint256"},{"indexed":false,"internalType":"bool","name":"isMintable","type":"bool"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Create","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"implementation","type":"address"}],"name":"Upgraded","type":"event"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"cNFTs","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_symbol","type":"string"},{"internalType":"string","name":"_uri","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"uint256[]","name":"tokenIDs","type":"uint256[]"},{"internalType":"bool","name":"_isMintable","type":"bool"}],"name":"create","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCGPTNFTs","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"length","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"}],"name":"upgradeTo","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"upgradeToAndCall","outputs":[],"stateMutability":"payable","type":"function"}]
@@ -36,7 +38,7 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
    "1":"0xdAC17F958D2ee523a2206206994597C13D831ec7", // Ethereum Mainnet
    "42161":"0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", // Arbitrum Mainnet
    "8453":"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base Mainnet
-   "84532":"0x74D8f222D3b8c173C24aD188f6B538159eE0F270", // Base Sepolia
+   "84532":"0x4A8b94f3A315E9961c177f377031dF79bf14bEE5", // Base Sepolia
    "146":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",// Sonic Mainnet
    "64165":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",// Sonic Testnet
    "137":"0x74D8f222D3b8c173C24aD188f6B538159eE0F270", // Polygon Mainnet
@@ -46,7 +48,8 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
    "196":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",//Xlayer Mainnet
    "59144":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",//Linea Mainnet
    "13711155111":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",//Polygon Amoy
-
+   "101":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",//Solana Mainnet
+   "10":"0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99",//Optimism Mainnet
   
   };
 
@@ -200,8 +203,6 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
       console.log("chainId: ", chainId)
       console.log("address: ", address)
       let chas = chainId ? toHex(chainId) : '0xaa36a7';
-      console.log("chas: ", chas)
-
       // First get the permissions
       const request: SmartSessionGrantPermissionsRequest = {
         expiry: Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60), // 3 days in seconds
@@ -260,29 +261,66 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
       const permissionsResponse = await grantPermissions(request);
       console.log("Permission granted:", permissionsResponse);
 
-      // Call the backend API to prepare calls
-      const response = await fetch('http://localhost:3001/api/prepare-calls', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: address,
-          chainId: chas,
-          tokenAddress: contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'],
-          recipientAddress: "0x0C3F6e88aD57473Ca2ae8a8C5CAFD6b270F98999",
-          amount: "1", // 1 USDT
-          permissionsContext: permissionsResponse.context || "98defbd5-380c-4c75-a5f8-17100027a4af"
-        })
+      // Encode the token transfer
+      const provider = new BrowserProvider(walletProvider, chainId);
+      const encodedTransfer = await encodeTokenTransfer(provider, {
+        tokenAddress: contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}`,
+        recipientAddress: "0x0C3F6e88aD57473Ca2ae8a8C5CAFD6b270F98999" as `0x${string}`,
+        amount: "1", // 1 USDT
+        fromAddress: address as `0x${string}`
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Now prepare the calls with the granted permissions
+      let args = {
+        from: address as `0x${string}`,
+        chainId: chas,
+        calls: [{
+          to: encodedTransfer.to,
+          data: encodedTransfer.data,
+          value: encodedTransfer.value
+        }],
+        capabilities: {
+          permissions: {
+            context: permissionsResponse.context || "98defbd5-380c-4c75-a5f8-17100027a4af"
+          }
+        }
+      };
+
+      console.log("Preparing calls with args:", args);
+      let preparedCalls = await prepareCalls(args);
+      console.log("Prepared Calls Response:", preparedCalls);
+      const response = preparedCalls[0];
+      if (!response || response.preparedCalls.type !== "user-operation-v07") {
+        throw new Error("Invalid response type");
       }
 
-      const preparedCalls = await response.json();
-      console.log("Prepared Calls Response:", preparedCalls);
+      const signatureRequest = response.signatureRequest;
+      console.log("Env Key: ", process.env.ecdsaPrivateKey)
+      const dappSignature = await signMessage({
+        privateKey: (process.env.ecdsaPrivateKey || '0x6ce83c916b830ffeb7ba3988befbbb71b8da4d7ee99dd0fdc3801c8a8f6badd4') as `0x${string}`,
+        message: { raw: signatureRequest.hash },
+      });
+      console.log("Dapp Signature: ",dappSignature)
+      console.log("PrepareCall: ",  response.preparedCalls)
+      console.log("Context: ", response.context)
+    
+      const sendPreparedCallsResponse = await sendPreparedCalls({
+        context: response.context,
+        preparedCalls: response.preparedCalls,
+        signature: dappSignature,
+      });
+    
+      const userOpIdentifier = sendPreparedCallsResponse[0];
+      console.log("ITs user Op Identifier: ", userOpIdentifier)
+      // After Prepare Call now it's time to send Calls
+
+
+
+
     } catch (error) {
+      // const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage = error instanceof Error ? error.message.split('\n')[0] : 'Unknown error occurred';
+      alert(`Error in handlePrepareCalls: ${errorMessage}`);
       console.error("Error in handlePrepareCalls:", error);
       // You might want to show this error to the user in the UI
     }
@@ -380,6 +418,14 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
                 width: '150px'
               }}
             >
+
+[
+
+
+
+ 
+
+      ]
               <option value="">Select Network</option>
               <option value="0">Ethereum</option>
               <option value="1">Arbitrum</option>
@@ -396,9 +442,11 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
               <option value="12">CoreDao</option>
               <option value="13">xLayer</option>
               <option value="14">Linea</option>
-              <option value="15">Polygon Amoy</option>
-
-              
+              <option value="15">Blast</option>
+              <option value="16">Berachain</option>
+              <option value="17">Polygon Amoy</option>
+              <option value="18">Solana</option>
+              <option value="19">Optimism</option>
             </select>
             <button 
               onClick={() => switchNetwork(networks[Number(networkIndex)])}

@@ -32,6 +32,13 @@ interface PrepareCallsRequest {
   permissionsContext: string;
 }
 
+interface SendPreparedCallsRequest {
+  preparedCalls: any;
+  chainId: string;
+  from: string;
+  permissionsContext: string;
+}
+
 // Standard ERC20 ABI for transfer method
 const ERC20_ABI = [
   "function transfer(address recipient, uint256 amount) returns (bool)",
@@ -147,6 +154,57 @@ app.get('/api/token-decimals/:chainId/:tokenAddress', async (req: Request, res: 
     const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
     const decimals = await tokenContract.decimals();
     res.json({ decimals });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/send-prepared-calls', async (req: Request<{}, {}, SendPreparedCallsRequest>, res: Response, next: NextFunction) => {
+  try {
+    const { 
+      preparedCalls,
+      chainId,
+      from,
+      permissionsContext
+    } = req.body;
+
+    const url = `${USEROP_BUILDER_SERVICE_BASE_URL}?projectId=${PROJECT_ID}`;
+    
+    // First, prepare the calls
+    const prepareResult = await jsonRpcRequest(
+      "wallet_prepareCalls",
+      [{
+        from,
+        chainId,
+        calls: preparedCalls.calls,
+        capabilities: {
+          permissions: {
+            context: permissionsContext,
+            methods: ["eth_sendTransaction"]
+          }
+        }
+      }],
+      url
+    );
+
+    // Then, send the prepared calls
+    const sendResult = await jsonRpcRequest(
+      "wallet_sendPreparedCalls",
+      [{
+        preparedCalls: prepareResult,
+        chainId,
+        from,
+        capabilities: {
+          permissions: {
+            context: permissionsContext,
+            methods: ["eth_sendTransaction"]
+          }
+        }
+      }],
+      url
+    );
+
+    res.json(sendResult);
   } catch (error) {
     next(error);
   }
