@@ -3,17 +3,10 @@ import { BrowserProvider, JsonRpcSigner, parseUnits, formatEther, Contract } fro
 import { networks } from '../config'
 import { grantPermissions, type SmartSessionGrantPermissionsRequest } from '@reown/appkit-experimental/smart-session'
 import { toHex } from 'viem'
-import { SendTransaction } from './SendTransaction'
 import { useState } from 'react'
 import { prepareCalls, sendPreparedCalls } from '../utils/UserOpBuilderServiceUtils'
 import { encodeTokenTransfer } from '../utils/tokenTransferUtils'
 import { signMessage } from "viem/accounts";
-
-// const { walletProvider } = useAppKitProvider<Provider>('eip155')
-
-let abi=[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"previousAdmin","type":"address"},{"indexed":false,"internalType":"address","name":"newAdmin","type":"address"}],"name":"AdminChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"beacon","type":"address"}],"name":"BeaconUpgraded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"nftAddress","type":"address"},{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"string","name":"symbol","type":"string"},{"indexed":false,"internalType":"string","name":"uri","type":"string"},{"indexed":false,"internalType":"uint256","name":"maxSupply","type":"uint256"},{"indexed":false,"internalType":"bool","name":"isMintable","type":"bool"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"Create","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"implementation","type":"address"}],"name":"Upgraded","type":"event"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"cNFTs","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_symbol","type":"string"},{"internalType":"string","name":"_uri","type":"string"},{"internalType":"uint256","name":"maxSupply","type":"uint256"},{"internalType":"uint256[]","name":"tokenIDs","type":"uint256[]"},{"internalType":"bool","name":"_isMintable","type":"bool"}],"name":"create","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCGPTNFTs","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"length","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"}],"name":"upgradeTo","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"upgradeToAndCall","outputs":[],"stateMutability":"payable","type":"function"}]
-let contractAddress="0x7A890D5E76C4693C1Af2Ac78A94cD3072eC1353a"
-
 
 interface ActionButtonListProps {
   sendHash: (hash: string) => void;
@@ -63,15 +56,15 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
  
 
   // function to sing a msg 
-  const handleSignMsg = async () => {
-    if (!walletProvider || !address) throw Error('user is disconnected');
+  // const handleSignMsg = async () => {
+  //   if (!walletProvider || !address) throw Error('user is disconnected');
 
-    const provider = new BrowserProvider(walletProvider, chainId);
-    const signer = new JsonRpcSigner(provider, address);
-    const sig = await signer?.signMessage('Hello Reown AppKit!');
+  //   const provider = new BrowserProvider(walletProvider, chainId);
+  //   const signer = new JsonRpcSigner(provider, address);
+  //   const sig = await signer?.signMessage('Hello Reown AppKit!');
 
-    sendSignMsg(sig);
-  }
+  //   sendSignMsg(sig);
+  // }
 
   // function to get the balance
   const handleGetBalance = async () => {
@@ -84,118 +77,76 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
   }
 
 
-  // function to get the balance
-  const handleRequestPermision = async () => {
-    try {
-      if (!walletProvider || !address) throw Error('user is disconnected');
-      // const chainId = await walletProvider.getChainId();
-      // console.log("chainId: ", chainId)
-      console.log("walletProvider: ", walletProvider)
-      console.log("chainId: ", chainId)
-      const request: SmartSessionGrantPermissionsRequest = {
-        expiry:  Date.now() + 1000,//Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
-        chainId: chainId ? toHex(chainId) :'0xaa36a7',// "0xaa36a7",
-        address: "0xeF3eB70B998114021cc3C1Af82E7877c17b95740",
-        signer: {
-          type: 'keys',
-          data: {
-            keys: [{
-              type: 'secp256k1',
-              publicKey: '0xeF3eB70B998114021cc3C1Af82E7877c17b95740' //public key of dapp signer
-            }]
-          }
-        },
-        permissions: [{
-          type: 'contract-call',
-          data: {
-            address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDTcontract address
-            abi: [
-              { "constant": false, "inputs": [{ "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "transfer", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }
-            ],
-            functions: [{
-              functionName: 'transfer'
-            }]
-          }
-        }],
-        policies: []
-      }
-      console.log("What is request: ", request)
-      const response = await grantPermissions(request)
-      console.log("Its Happening To Get Grant Permision of Transaction")
-      console.log("Is it throwing any Error", response)
-    } catch (err) {
-      console.log("This error is happening: ", err)
-    }
-  }
-  const handleTransferRequestPermision = async()=>{
-    try {
-      if (!walletProvider || !address) throw Error('user is disconnected');
-      console.log("walletProvider: ", walletProvider)
-      console.log("chainId: ", chainId)
-      console.log("address: ", address)
-      let chas = chainId ? toHex(chainId) :'12';
-      console.log("chas: ", chas)
 
-      const request: SmartSessionGrantPermissionsRequest = {
-        expiry: Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60), // 3 days in seconds
-        chainId:chainId ? toHex(chainId) :'0xaa36a7',
-        address:address as `0x${string}`,
-        signer: {
-          type: 'keys',
-          data: {
-            keys: [{
-              type: 'secp256k1',
-              publicKey:address as `0x${string}` //public key of dapp signer
-            }]
-          }
-        },
-        permissions: [{
-          type: 'contract-call',
-          data: {
-            address:  contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}` , // USDTcontract address
-            abi: [
-              {
-                "constant": false,
-                "inputs": [
-                  {
-                    "internalType": "address",
-                    "name": "recipient",
-                    "type": "address"
-                  },
-                  {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                  }
-                ],
-                "name": "transfer",
-                "outputs": [
-                  {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                  }
-                ],
-                "payable": false,
-                "stateMutability": "nonpayable",
-                "type": "function"
-              }
-            ],
-            functions: [{
-              functionName: 'transfer'
-            }]
-          }
-        }],
-        policies: []
-      }
-      console.log("What is request: ", request)
-      const response = await grantPermissions(request)
-      console.log("Its Happening To Get Grant Permision of Transaction")
-      console.log("Is it throwing any Error", response)
-    } catch (err) {
-      console.log("This error is happening: ", err)
-    }
-  }
+  // const handleTransferRequestPermision = async()=>{
+  //   try {
+  //     if (!walletProvider || !address) throw Error('user is disconnected');
+  //     console.log("walletProvider: ", walletProvider)
+  //     console.log("chainId: ", chainId)
+  //     console.log("address: ", address)
+  //     let chas = chainId ? toHex(chainId) :'12';
+  //     console.log("chas: ", chas)
+
+  //     const request: SmartSessionGrantPermissionsRequest = {
+  //       expiry: Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60), // 3 days in seconds
+  //       chainId:chainId ? toHex(chainId) :'0xaa36a7',
+  //       address:address as `0x${string}`,
+  //       signer: {
+  //         type: 'keys',
+  //         data: {
+  //           keys: [{
+  //             type: 'secp256k1',
+  //             publicKey:address as `0x${string}` //public key of dapp signer
+  //           }]
+  //         }
+  //       },
+  //       permissions: [{
+  //         type: 'contract-call',
+  //         data: {
+  //           address:  contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}` , // USDTcontract address
+  //           abi: [
+  //             {
+  //               "constant": false,
+  //               "inputs": [
+  //                 {
+  //                   "internalType": "address",
+  //                   "name": "recipient",
+  //                   "type": "address"
+  //                 },
+  //                 {
+  //                   "internalType": "uint256",
+  //                   "name": "amount",
+  //                   "type": "uint256"
+  //                 }
+  //               ],
+  //               "name": "transfer",
+  //               "outputs": [
+  //                 {
+  //                   "internalType": "bool",
+  //                   "name": "",
+  //                   "type": "bool"
+  //                 }
+  //               ],
+  //               "payable": false,
+  //               "stateMutability": "nonpayable",
+  //               "type": "function"
+  //             }
+  //           ],
+  //           functions: [{
+  //             functionName: 'transfer'
+  //           }]
+  //         }
+  //       }],
+  //       policies: []
+  //     }
+  //     console.log("What is request: ", request)
+  //     const response = await grantPermissions(request)
+  //     console.log("Its Happening To Get Grant Permision of Transaction")
+  //     console.log("Is it throwing any Error", response)
+  //   } catch (err) {
+  //     console.log("This error is happening: ", err)
+  //   }
+  // }
   const handlePrepareCalls = async()=>{
     try {
       if (!walletProvider || !address) throw Error('user is disconnected');
@@ -288,9 +239,15 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
       }
 
       const signatureRequest = response.signatureRequest;
+      const privateKey = import.meta.env.VITE_ECDSA_PRIVATE_KEY;
+      // console.log("Private Key:", privateKey);
       
+      if (!privateKey) {
+        throw new Error("ECDSA private key is not configured");
+      }
+
       const dappSignature = await signMessage({
-        privateKey: process.env.ecdsaPrivateKey as `0x${string}`,
+        privateKey: privateKey as `0x${string}`,
         message: { raw: signatureRequest.hash },
       });
       const sendPreparedCallsResponse = await sendPreparedCalls({
@@ -308,66 +265,66 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
     }
   }
 
-  const handleRequestPermission1 = async () => {
-    try {
-      if (!walletProvider || !address) throw Error('user is disconnected');
+  // const handleRequestPermission1 = async () => {
+  //   try {
+  //     if (!walletProvider || !address) throw Error('user is disconnected');
   
-      const request: SmartSessionGrantPermissionsRequest = {
-        expiry: Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60), // 3 days in seconds
-        chainId: chainId ? toHex(chainId) :'0xaa36a7',
-        address: address as `0x${string}`,
-        signer: {
-          type: 'keys',
-          data: {
-            keys: [{
-              type: 'secp256k1',
-              publicKey: address as `0x${string}`
-            }]
-          }
-        },
-        permissions: [{
-          type: 'contract-call',
-          data: {
-            address: '0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99', // USDT contract
-            abi: [
-              {
-                constant: false,
-                inputs: [
-                  {
-                    name: "recipient",
-                    type: "address"
-                  },
-                  {
-                    name: "amount",
-                    type: "uint256"
-                  }
-                ],
-                name: "transfer",
-                outputs: [{ type: "bool", name: "" }],
-                payable: false,
-                stateMutability: "nonpayable",
-                type: "function"
-              }
-            ],
-            functions: [{
-              functionName: 'transfer'
-            }]
-          }
-        }],
-        policies: []
-      };
+  //     const request: SmartSessionGrantPermissionsRequest = {
+  //       expiry: Math.floor(Date.now() / 1000) + (3 * 24 * 60 * 60), // 3 days in seconds
+  //       chainId: chainId ? toHex(chainId) :'0xaa36a7',
+  //       address: address as `0x${string}`,
+  //       signer: {
+  //         type: 'keys',
+  //         data: {
+  //           keys: [{
+  //             type: 'secp256k1',
+  //             publicKey: address as `0x${string}`
+  //           }]
+  //         }
+  //       },
+  //       permissions: [{
+  //         type: 'contract-call',
+  //         data: {
+  //           address: '0x8Ef14ACf20223fcC4489e1cd3f064a1300Beac99', // USDT contract
+  //           abi: [
+  //             {
+  //               constant: false,
+  //               inputs: [
+  //                 {
+  //                   name: "recipient",
+  //                   type: "address"
+  //                 },
+  //                 {
+  //                   name: "amount",
+  //                   type: "uint256"
+  //                 }
+  //               ],
+  //               name: "transfer",
+  //               outputs: [{ type: "bool", name: "" }],
+  //               payable: false,
+  //               stateMutability: "nonpayable",
+  //               type: "function"
+  //             }
+  //           ],
+  //           functions: [{
+  //             functionName: 'transfer'
+  //           }]
+  //         }
+  //       }],
+  //       policies: []
+  //     };
   
-      console.log("Requesting permissions with:", request);
-      const response = await grantPermissions(request);
-      console.log("Permission granted:", response);
+  //     console.log("Requesting permissions with:", request);
+  //     const response = await grantPermissions(request);
+  //     console.log("Permission granted:", response);
       
-      // You might want to store the response for later use
-      return response;
-    } catch (error) {
-      console.error("Smart session error:", error);
-      throw error;
-    }
-  };
+  //     // You might want to store the response for later use
+  //     return response;
+  //   } catch (error) {
+  //     console.error("Smart session error:", error);
+  //     throw error;
+  //   }
+  // };
 
   return (
     <div>
@@ -376,10 +333,10 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
           <button onClick={() => open()}>Open</button>
           <button onClick={handleDisconnect}>Disconnect</button>
         
-          <button onClick={handleSignMsg}>Sign msg</button>
+          {/* <button onClick={handleSignMsg}>Sign msg</button> */}
           <button onClick={handleGetBalance}>Get Balance</button>
-          <button onClick={handleRequestPermission1}>Request Permission</button>
-          <button onClick={handleTransferRequestPermision}>Transfer Request Permission CGPT</button>
+          {/* <button onClick={handleRequestPermission1}>Request Permission</button> */}
+          {/* <button onClick={handleTransferRequestPermision}>Transfer Request Permission CGPT</button> */}
        
     <button onClick={handlePrepareCalls}>Prepare Calls</button>
           <div style={{ 
@@ -401,13 +358,7 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
               }}
             >
 
-[
-
-
-
- 
-
-      ]
+[]
               <option value="">Select Network</option>
               <option value="0">Ethereum</option>
               <option value="1">Arbitrum</option>
