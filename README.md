@@ -10,9 +10,19 @@ This is a [Vite](https://vitejs.dev) project together with React.
 4. Run `pnpm install` to install dependencies
 5. Run `pnpm run dev` to start the development server
 
-## Resources
-
-- [Reown — Docs](https://docs.reown.com)
-- [Vite — GitHub](https://github.com/vitejs/vite)
-- [Vite — Docs](https://vitejs.dev/guide/)
 # appkit-smart-session
+
+# Switch Network
+Select Network and Click on Switch to change Network
+
+# Session Creation and Automation
+Prepare Call
+The Prepare Call initiates the session creation process.
+
+When the Prepare Call is invoked, it performs the following steps:
+
+   Creates the initial session.
+   prepare call
+
+   Sends the Prepare request.
+     Within this step, it also internally calls the sendPrepare() function to handle the actual request transmission.
