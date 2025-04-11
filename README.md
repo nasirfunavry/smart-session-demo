@@ -16,13 +16,13 @@ This is a [Vite](https://vitejs.dev) project together with React.
 Select Network and Click on Switch to change Network
 
 # Session Creation and Automation
-Prepare Call
-The Prepare Call initiates the session creation process.
+ # Prepare Call
+    The Prepare Call initiates the session creation process.
 
-When the Prepare Call is invoked, it performs the following steps:
+    When the Prepare Call is invoked, it performs the following steps:
 
-   Creates the initial session.
-   prepare call
+     Creates the initial session.
+     prepare call
 
-   Sends the Prepare request.
-     Within this step, it also internally calls the sendPrepare() function to handle the actual request transmission.
+     Sends the Prepare request.
+       Within this step, it also internally calls the sendPrepare() function to handle the actual request transmission.
