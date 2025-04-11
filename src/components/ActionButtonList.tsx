@@ -199,9 +199,6 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
   const handlePrepareCalls = async()=>{
     try {
       if (!walletProvider || !address) throw Error('user is disconnected');
-      console.log("walletProvider: ", walletProvider)
-      console.log("chainId: ", chainId)
-      console.log("address: ", address)
       let chas = chainId ? toHex(chainId) : '0xaa36a7';
       // First get the permissions
       const request: SmartSessionGrantPermissionsRequest = {
@@ -213,14 +210,14 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
           data: {
             keys: [{
               type: 'secp256k1',
-              publicKey: address as `0x${string}`
+              publicKey:"0x48C06E8c0dbaAE2d284971Fa73D27288118b5FdF", //address as `0x${string}`
             }]
           }
         },
         permissions: [{
           type: 'contract-call',
           data: {
-            address: contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}`,
+            address: contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}`,// USDT Contract Address
             abi: [
               {
                 "constant": false,
@@ -256,15 +253,12 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
         }],
         policies: []
       };
-
-      console.log("Requesting permissions with:", request);
       const permissionsResponse = await grantPermissions(request);
-      console.log("Permission granted:", permissionsResponse);
-
+      console.log("Permision Response", permissionsResponse)
       // Encode the token transfer
       const provider = new BrowserProvider(walletProvider, chainId);
       const encodedTransfer = await encodeTokenTransfer(provider, {
-        tokenAddress: contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}`,
+        tokenAddress: contractForNetwork[chainId ? chainId.toString() as keyof typeof contractForNetwork : '97'] as `0x${string}`, //  USDT contract address
         recipientAddress: "0x0C3F6e88aD57473Ca2ae8a8C5CAFD6b270F98999" as `0x${string}`,
         amount: "1", // 1 USDT
         fromAddress: address as `0x${string}`
@@ -281,29 +275,24 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
         }],
         capabilities: {
           permissions: {
-            context: permissionsResponse.context || "98defbd5-380c-4c75-a5f8-17100027a4af"
+            context: permissionsResponse.context 
           }
         }
       };
 
       console.log("Preparing calls with args:", args);
       let preparedCalls = await prepareCalls(args);
-      console.log("Prepared Calls Response:", preparedCalls);
       const response = preparedCalls[0];
       if (!response || response.preparedCalls.type !== "user-operation-v07") {
         throw new Error("Invalid response type");
       }
 
       const signatureRequest = response.signatureRequest;
-      console.log("Env Key: ", process.env.ecdsaPrivateKey)
+      
       const dappSignature = await signMessage({
-        privateKey: (process.env.ecdsaPrivateKey || '0x6ce83c916b830ffeb7ba3988befbbb71b8da4d7ee99dd0fdc3801c8a8f6badd4') as `0x${string}`,
+        privateKey: process.env.ecdsaPrivateKey as `0x${string}`,
         message: { raw: signatureRequest.hash },
       });
-      console.log("Dapp Signature: ",dappSignature)
-      console.log("PrepareCall: ",  response.preparedCalls)
-      console.log("Context: ", response.context)
-    
       const sendPreparedCallsResponse = await sendPreparedCalls({
         context: response.context,
         preparedCalls: response.preparedCalls,
@@ -311,18 +300,11 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
       });
     
       const userOpIdentifier = sendPreparedCallsResponse[0];
-      console.log("ITs user Op Identifier: ", userOpIdentifier)
-      // After Prepare Call now it's time to send Calls
-
-
 
 
     } catch (error) {
-      // const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      const errorMessage = error instanceof Error ? error.message.split('\n')[0] : 'Unknown error occurred';
-      alert(`Error in handlePrepareCalls: ${errorMessage}`);
+      // const errorMessage = error instanceof Error ? error.message.split('\n')[0] : 'Unknown error occurred';
       console.error("Error in handlePrepareCalls:", error);
-      // You might want to show this error to the user in the UI
     }
   }
 
