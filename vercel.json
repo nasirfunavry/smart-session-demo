@@ -1,6 +1,10 @@
 {
   "buildCommand": "npm install && npm run dev",
-  "outputDirectory": ".vercel/output",
-  "ignoreCommand": "echo 'skip build'",
-  "cleanUrls": true
+  "outputDirectory": "dist",  // Optional if needed
+  "cleanUrls": true,
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "vercel-node@1.0.0"
+    }
+  }
 }
