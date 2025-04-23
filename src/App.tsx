@@ -1,9 +1,9 @@
 import { createAppKit } from '@reown/appkit/react'
 import { networks, projectId, metadata, ethersAdapter, solanaWeb3JsAdapter } from './config'
-import { ActionButtonList } from './components/ActionButtonList'
+// import { ActionButtonList } from './components/ActionButtonList'
 import { SmartContractActionButtonList } from './components/SmartContractActionButtonList'
-import { InfoList } from './components/InfoList'
-import { useState } from 'react'
+// import { InfoList } from './components/InfoList'
+// import { useState } from 'react'
 
 import "./App.css"
 
@@ -23,28 +23,28 @@ createAppKit({
 })
 
 export function App() {
-  const [transactionHash, setTransactionHash] = useState('');
-  const [signedMsg, setSignedMsg] = useState('');
-  const [balance, setBalance] = useState('');
+  // const [transactionHash, setTransactionHash] = useState('');
+  // const [signedMsg, setSignedMsg] = useState('');
+  // const [balance, setBalance] = useState('');
 
-  const receiveHash = (hash: string) => {
-    setTransactionHash(hash); // Update the state with the transaction hash
-  };
+  // const receiveHash = (hash: string) => {
+  //   setTransactionHash(hash); // Update the state with the transaction hash
+  // };
 
-  const receiveSignedMsg = (signedMsg: string) => {
-    setSignedMsg(signedMsg); // Update the state with the transaction hash
-  };
+  // const receiveSignedMsg = (signedMsg: string) => {
+  //   setSignedMsg(signedMsg); // Update the state with the transaction hash
+  // };
 
-  const receivebalance = (balance: string) => {
-    setBalance(balance)
-  }
+  // const receivebalance = (balance: string) => {
+  //   setBalance(balance)
+  // }
 
   return (
     <div className={"pages"}>
       {/* <img src="/reown.svg" alt="Reown" style={{ width: '150px', height: '150px' }} /> */}
       <h1>AppKit Smart Account Testing</h1>
           <appkit-button />
-          <ActionButtonList sendHash={receiveHash} sendSignMsg={receiveSignedMsg} sendBalance={receivebalance}/>
+          {/* <ActionButtonList sendHash={receiveHash} sendSignMsg={receiveSignedMsg} sendBalance={receivebalance}/> */}
           <SmartContractActionButtonList />
           {/* <div className="advice">
             <p>
@@ -52,7 +52,7 @@ export function App() {
               Go to <a href="https://cloud.reown.com" target="_blank" className="link-button" rel="Reown Cloud">Reown Cloud</a> to get your own.
             </p>
           </div> */}
-          <InfoList hash={transactionHash} signedMsg={signedMsg} balance={balance}/>
+          {/* <InfoList hash={transactionHash} signedMsg={signedMsg} balance={balance}/> */}
     </div>
   )
 }

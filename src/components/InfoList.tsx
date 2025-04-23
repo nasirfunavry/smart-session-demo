@@ -4,7 +4,6 @@ import {
     useAppKitTheme,
     useAppKitEvents,
     useAppKitAccount,
-    useWalletInfo,
     useAppKitProvider, 
     useAppKitNetworkCore,
     type Provider 
@@ -20,12 +19,11 @@ interface InfoListProps {
 export const InfoList = ({ hash, signedMsg, balance }: InfoListProps) => {
     const [statusTx, setStatusTx] = useState('');
 
-    const { themeMode, themeVariables } = useAppKitTheme();
+    const { } = useAppKitTheme();
     const state = useAppKitState();
     const { chainId } = useAppKitNetworkCore();
     const {address, caipAddress, isConnected, embeddedWalletInfo } = useAppKitAccount(); // AppKit hook to get the account information
     const events = useAppKitEvents()
-    const walletInfo = useWalletInfo()
     const { walletProvider } = useAppKitProvider<Provider>('eip155')
     // console.log("walletProvider: ", walletProvider)
     // console.log("useAppKitAccount(): ", useAppKitAccount())

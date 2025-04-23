@@ -1,5 +1,5 @@
-import { useDisconnect, useAppKit, useAppKitNetwork, useAppKitAccount, useAppKitProvider, useAppKitNetworkCore, type Provider } from '@reown/appkit/react'
-import { BrowserProvider, JsonRpcSigner, parseUnits, formatEther, Contract } from 'ethers'
+import { useDisconnect, useAppKit, useAppKitNetwork, useAppKitAccount, useAppKitProvider, type Provider } from '@reown/appkit/react'
+import { BrowserProvider, formatEther } from 'ethers'
 import { networks } from '../config'
 import { grantPermissions, type SmartSessionGrantPermissionsRequest } from '@reown/appkit-experimental/smart-session'
 import { toHex } from 'viem'
@@ -9,13 +9,12 @@ import { encodeTokenTransfer } from '../utils/tokenTransferUtils'
 import { signMessage } from "viem/accounts";
 
 interface ActionButtonListProps {
-  sendHash: (hash: string) => void;
-  sendSignMsg: (hash: string) => void;
+  // sendHash: (hash: string) => void;
+  // sendSignMsg: (hash: string) => void;
   sendBalance: (balance: string) => void;
-
 }
 
-export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionButtonListProps) => {
+export const ActionButtonList = ({  sendBalance }: ActionButtonListProps) => {
   const { disconnect } = useDisconnect();
   const { open } = useAppKit();
   // const { chainId } = useAppKitNetworkCore();
@@ -256,7 +255,8 @@ export const ActionButtonList = ({ sendHash, sendSignMsg, sendBalance }: ActionB
         signature: dappSignature,
       });
     
-      const userOpIdentifier = sendPreparedCallsResponse[0];
+      // If sendPreparedCallsResponse is needed, use it directly without assignment
+      sendPreparedCallsResponse[0];
 
 
     } catch (error) {
