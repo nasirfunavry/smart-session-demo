@@ -29,4 +29,4 @@ Select Network and Click on Switch to change Network
 
 # One Click Deploy
 
-[![One Click](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnasirfunavry%2Fsmart-session-demo&branch=dev)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnasirfunavry%2Fsmart-session-demo%2Ftree%2Fdev&env=VITE_PROJECT_ID,NEXT_PUBLIC_PROJECT_ID,VITE_ECDSA_PRIVATE_KEY&envDescription=Test%20File%20of%20.env%20File%20here&envLink=https%3A%2F%2Fgithub.com%2Fnasirfunavry%2Fsmart-session-demo%2Fblob%2Fdev%2F.env.test&project-name=onecclick&repository-name=oneclick)
