@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm install && npm run dev",
+  "outputDirectory": ".vercel/output",
+  "ignoreCommand": "echo 'skip build'",
+  "cleanUrls": true
+}

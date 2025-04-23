@@ -1,0 +1,10 @@
+spec:
+  name: sample-nodejs
+  services:
+    - name: web
+      git:
+        branch: main
+        repo_clone_url: https://github.com/your-username/sample-node-app.git
+      run_command: npm start
+      build_command: npm install
+      environment_slug: node-js
