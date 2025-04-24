@@ -1,5 +1,5 @@
 services:
-  - type: web
+  - type: static
     name: smart-session-demo
     env: node
     repo: https://github.com/nasirfunavry/smart-session-demo/tree/dev
@@ -12,3 +12,4 @@ services:
         value: production
       - key: YOUR_CUSTOM_ENV
         value: your-value
+    staticPublishPath: ./build
