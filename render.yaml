@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: smart-session-demo
-    env: node
+    name: my-react-app
+    env: static
+    staticPublishPath: build
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    autoDeploy: false
     envVars:
-      - key: NODE_ENV
-        value: production
-    autoDeploy: true
+      - key: NODE_VERSION
+        value: 18
