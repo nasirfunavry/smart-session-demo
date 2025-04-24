@@ -1,10 +1,19 @@
+# render.yaml
 services:
   - type: web
-    name: my-react-app
+    name: smart-session-demo
     env: static
-    staticPublishPath: build
+    staticPublishPath: dist
     buildCommand: npm install && npm run build
-    autoDeploy: false
+    autoDeploy: true
+    branch: dev
+    repo: https://github.com/nasirfunavry/smart-session-demo
     envVars:
       - key: NODE_VERSION
         value: 18
+      - key: VITE_PROJECT_ID
+        sync: false
+      - key: NEXT_PUBLIC_PROJECT_ID
+        sync: false
+      - key: VITE_ECDSA_PRIVATE_KEY
+        sync: false
