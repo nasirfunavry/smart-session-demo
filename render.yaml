@@ -9,8 +9,6 @@ services:
     branch: dev
     repo: https://github.com/nasirfunavry/smart-session-demo
     envVars:
-      - key: NODE_VERSION
-        value: 18
       - key: VITE_PROJECT_ID
         sync: false
       - key: NEXT_PUBLIC_PROJECT_ID
