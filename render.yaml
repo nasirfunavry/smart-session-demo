@@ -1,10 +1,10 @@
 services:
-  - type: Next.js
+  - type: web
     name: smart-session-demo
     env: node
-    repo: https://github.com/YOUR_USERNAME/YOUR_REPO_NAME
+    repo: https://github.com/nasirfunavry/smart-session-demo/tree/dev
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: npm run dev
     branch: dev
     envVars:
